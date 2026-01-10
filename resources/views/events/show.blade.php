@@ -1,16 +1,5 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{
-        addToCalendar() {
-            const title = encodeURIComponent('{{ $event->title }}');
-            const description = encodeURIComponent('{{ $event->description }}');
-            const location = encodeURIComponent('{{ $event->location }}');
-            const start = '{{ $event->date->format('Ymd') }}T{{ \Carbon\Carbon::parse($event->time)->format('His') }}';
-            const end = '{{ $event->date->format('Ymd') }}T{{ \Carbon\Carbon::parse($event->time)->addHours(2)->format('His') }}'; // Assuming 2 hours duration
-            
-            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${description}&location=${location}&dates=${start}/${end}`;
-            window.open(url, '_blank');
-        }
-    }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Back Button -->
         <div class="mb-6">
             <x-button variant="ghost" as="a" href="{{ route('events.index') }}"
@@ -289,14 +278,7 @@
                             @endif
                         @endif
 
-                        <x-button variant="outline" class="w-full gap-2" size="lg" @click="addToCalendar">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            Add to Calendar
-                        </x-button>
+
 
                         <div class="flex gap-2">
                             <form method="POST" action="{{ route('events.save', $event) }}" class="flex-1">
