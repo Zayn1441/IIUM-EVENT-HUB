@@ -63,6 +63,10 @@
                 @endforelse
             </div>
 
+            <div class="mt-6">
+                {{ $events->links() }}
+            </div>
+
             <x-modal name="delete-confirmation" title="Delete Event"
                 description="Are you sure you want to delete this event? This action cannot be undone."
                 confirmText="Yes, Delete" cancelText="No, Cancel" confirmStyle="danger">

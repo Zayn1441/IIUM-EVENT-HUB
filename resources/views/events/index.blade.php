@@ -124,7 +124,7 @@
 
         <!-- Results Count -->
         <div class="text-muted-foreground">
-            Showing {{ $events->count() }} events
+            Showing {{ $events->firstItem() ?? 0 }} to {{ $events->lastItem() ?? 0 }} of {{ $events->total() }} events
         </div>
 
         @if($events->count() > 0)
@@ -132,6 +132,11 @@
                 @foreach ($events as $event)
                     <x-event-card :event="$event" />
                 @endforeach
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-8">
+                {{ $events->links() }}
             </div>
         @else
             <div class="text-center py-12">

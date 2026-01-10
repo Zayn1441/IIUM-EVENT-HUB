@@ -19,7 +19,7 @@
     <!-- Image Placeholder -->
     <div class="h-40 bg-muted w-full relative overflow-hidden">
         @if($event->image_path)
-            <img src="{{ asset($event->image_path) }}" alt="{{ $event->title }}"
+            <img src="{{ asset($event->image_path) }}" alt="{{ $event->title }}" loading="lazy"
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
         @else
             <!-- Dynamic color based on category -->

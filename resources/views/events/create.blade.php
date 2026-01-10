@@ -91,7 +91,7 @@
                             <x-select.item value="Academic">Academic</x-select.item>
                             <x-select.item value="Cultural">Cultural</x-select.item>
                             <x-select.item value="Sports">Sports</x-select.item>
-                            <x-select.item value="Spiritual">Spiritual</x-select.item>
+                            <x-select.item value="Religious">Religious</x-select.item>
                             <x-select.item value="Social">Social</x-select.item>
                             <x-select.item value="Workshop">Workshop</x-select.item>
                             <x-select.item value="Market">Market</x-select.item>

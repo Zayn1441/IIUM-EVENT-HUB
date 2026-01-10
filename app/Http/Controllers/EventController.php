@@ -80,7 +80,7 @@ class EventController extends Controller
                 break;
         }
 
-        $events = $query->withCount('registrations')->get();
+        $events = $query->withCount('registrations')->paginate(12)->withQueryString();
 
         return view('events.index', compact('events'));
     }
@@ -116,7 +116,7 @@ class EventController extends Controller
         $imagePath = null;
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('events', 'public');
-            $imagePath = '/storage/' . $path;
+            $imagePath = \Illuminate\Support\Facades\Storage::url($path);
         }
 
         $event = Event::create([
@@ -202,14 +202,14 @@ class EventController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($event->image_path) {
-                $oldPath = str_replace('/storage/', '', $event->image_path);
-                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldPath)) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                $relativePath = str_replace('/storage/', '', $event->image_path);
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($relativePath)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($relativePath);
                 }
             }
 
             $path = $request->file('image')->store('events', 'public');
-            $validated['image_path'] = '/storage/' . $path;
+            $validated['image_path'] = \Illuminate\Support\Facades\Storage::url($path);
         }
 
         $event->update([
@@ -260,8 +260,11 @@ class EventController extends Controller
         }
 
         // Delete image if exists
-        if ($event->image_path && file_exists(public_path($event->image_path))) {
-            unlink(public_path($event->image_path));
+        if ($event->image_path) {
+            $relativePath = str_replace('/storage/', '', $event->image_path);
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($relativePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($relativePath);
+            }
         }
 
         $event->delete();
@@ -280,7 +283,7 @@ class EventController extends Controller
             ->orderByRaw("CASE WHEN CONCAT(date, ' ', time) >= NOW() THEN 0 ELSE 1 END")
             ->orderBy('date', 'asc')
             ->orderBy('time', 'asc')
-            ->get();
+            ->paginate(12);
         return view('events.my-events', compact('events'));
     }
 
