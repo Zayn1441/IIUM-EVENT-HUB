@@ -1,0 +1,1 @@
+<span class="block truncate" x-text="value ? label : '{{ $placeholder ?? 'Select...' }}'"></span>
