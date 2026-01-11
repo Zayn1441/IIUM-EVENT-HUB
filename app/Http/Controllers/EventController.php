@@ -133,6 +133,14 @@ class EventController extends Controller
             'image_path' => $imagePath,
         ]);
 
+        // Auto-save for creator
+        \App\Models\Registration::create([
+            'user_id' => auth()->id(),
+            'event_id' => $event->id,
+            'status' => 'pending',
+            'type' => 'saved'
+        ]);
+
         // Handle Tags (Simple implementation: split by comma if string, or handle array)
         // Ideally we'd use the 'tags' relationship. For now, let's create tags if they don't exist.
         if ($request->filled('tags')) {
@@ -224,6 +232,31 @@ class EventController extends Controller
             'participation_link' => $validated['participation_link'],
             'is_starpoints' => $validated['is_starpoints'],
         ]);
+
+        // If Date or Time changed, clear stale system notices (Tomorrow/Passed)
+        if ($event->wasChanged(['date', 'time'])) {
+            \App\Models\Notice::where('action_url', route('events.show', $event))
+                ->where('type', 'system')
+                ->whereIn('title', ['Event Starting Tomorrow', 'Event Passed'])
+                ->delete();
+        }
+
+        // Notify all registered/saved users about the update
+        $registrations = $event->registrations()->select('user_id')->distinct()->get();
+        foreach ($registrations as $registration) {
+            // Skip the user who made the update (usually the creator/admin)
+            if ($registration->user_id == auth()->id()) {
+                continue;
+            }
+
+            \App\Models\Notice::create([
+                'user_id' => $registration->user_id,
+                'type' => 'event_update',
+                'title' => 'Event Updated',
+                'message' => "The event '{$event->title}' has been updated. Check the new details.",
+                'action_url' => route('events.show', $event),
+            ]);
+        }
 
         // Notify user if updated by Admin
         if (auth()->user()->is_admin && $event->user_id !== auth()->id()) {
