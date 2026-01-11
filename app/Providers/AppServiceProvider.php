@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Share reports count with sidebar/layout
+        \Illuminate\Support\Facades\View::composer('layouts.app', function ($view) {
+            $reportsCount = 0;
+            if (auth()->check() && auth()->user()->is_admin) {
+                $reportsCount = \App\Models\Report::count();
+            }
+            $view->with('reportsCount', $reportsCount);
+        });
     }
 }

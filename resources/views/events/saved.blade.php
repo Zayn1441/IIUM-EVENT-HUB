@@ -1,5 +1,7 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6" x-data="{ unsaveAction: '' }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6" 
+        x-data="{ unsaveAction: '' }" 
+        @set-unsave-action.window="unsaveAction = $event.detail">
         <!-- Header -->
         <div>
             <h1 class="text-3xl font-bold text-foreground">Saved Events</h1>
@@ -183,7 +185,7 @@
                                                 </x-button>
 
                                                 <x-button variant="destructive" size="sm"
-                                                    x-on:click.prevent="$dispatch('open-modal', 'confirm-unsave'); unsaveAction = '{{ route('events.save', $event) }}'"
+                                                    x-on:click.prevent="console.log('Dispatching unsave:', '{{ route('events.save', $event) }}'); $dispatch('set-unsave-action', '{{ route('events.save', $event) }}'); $dispatch('open-modal', 'confirm-unsave')"
                                                     class="w-full md:w-auto">
                                                     Unsave
                                                 </x-button>
@@ -230,22 +232,20 @@
             </x-card.content>
         </x-card>
         @endif
-    </div>
-
     <x-modal name="confirm-unsave" focusable>
         <form method="post" :action="unsaveAction" class="p-6">
             @csrf
             
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <h2 class="text-lg font-medium text-gray-900">
                 {{ __('Remove from Saved Events?') }}
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-1 text-sm text-gray-600">
                 {{ __('Are you sure you want to remove this event from your saved list? You can always save it again later.') }}
             </p>
 
             <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'confirm-unsave')">
                     {{ __('Cancel') }}
                 </x-secondary-button>
 
@@ -255,4 +255,5 @@
             </div>
         </form>
     </x-modal>
+</div>
 </x-app-layout>

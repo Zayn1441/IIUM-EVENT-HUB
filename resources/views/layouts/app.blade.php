@@ -124,6 +124,28 @@
                         </x-sidebar.menu-item>
                     </div>
 
+                    @if(auth()->user()->is_admin)
+                        <div class="px-2 py-2 mt-4">
+                            <h4 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">Admin</h4>
+                            <x-sidebar.menu-item>
+                                <x-sidebar.menu-button :active="request()->routeIs('admin.reports.index')" as="a"
+                                    href="{{ route('admin.reports.index') }}">
+                                    <svg class="size-4 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                    <span>Reported Events</span>
+                                    @if(isset($reportsCount) && $reportsCount > 0)
+                                        <span class="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-600 text-[10px] font-medium text-white">
+                                            {{ $reportsCount }}
+                                        </span>
+                                    @endif
+                                </x-sidebar.menu-button>
+                            </x-sidebar.menu-item>
+                        </div>
+                    @endif
+
                 </x-sidebar.menu>
             </x-sidebar.content>
 
@@ -200,6 +222,51 @@
             });
         </script>
     @endif
+    <x-modal name="no-link-modal" focusable>
+        <div class="p-6 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
+                <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h2 class="text-lg font-medium text-gray-900 mb-2">
+                No Registration Link
+            </h2>
+            <p class="text-sm text-gray-500 mb-6">
+                The organizer has not provided a participation link for this event. Please contact the organizer
+                directly or check the venue details.
+            </p>
+            <div class="flex justify-center">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'no-link-modal')">
+                    Close
+                </x-secondary-button>
+            </div>
+        </div>
+    </x-modal>
+
+    <x-modal name="event-passed-modal" focusable>
+        <div class="p-6 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+                <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h2 class="text-lg font-medium text-gray-900 mb-2">
+                Event Has Passed
+            </h2>
+            <p class="text-sm text-gray-500 mb-6">
+                This event has already taken place and registration is closed.
+            </p>
+            <div class="flex justify-center">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'event-passed-modal')">
+                    Close
+                </x-secondary-button>
+            </div>
+        </div>
+    </x-modal>
+
     @stack('scripts')
 </body>
 

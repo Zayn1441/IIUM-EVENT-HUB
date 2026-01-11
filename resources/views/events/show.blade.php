@@ -256,9 +256,12 @@
 
                         @if($event->participation_link)
                             @if($isPast)
-                                <x-button class="w-full" size="lg" type="button" onclick="alert('The event has passed')">
-                                    Join Event
-                                </x-button>
+                                <div x-data>
+                                    <x-button class="w-full opacity-75" size="lg" type="button"
+                                        x-on:click="$dispatch('open-modal', 'event-passed-modal')">
+                                        Join Event
+                                    </x-button>
+                                </div>
                             @else
                                 <x-button class="w-full" size="lg" as="a" href="{{ $event->participation_link }}"
                                     target="_blank">
@@ -267,14 +270,19 @@
                             @endif
                         @else
                             @if($isPast)
-                                <x-button class="w-full" size="lg" type="button" onclick="alert('The event has passed')">
-                                    Join Event
-                                </x-button>
+                                <div x-data>
+                                    <x-button class="w-full opacity-75" size="lg" type="button"
+                                        x-on:click="$dispatch('open-modal', 'event-passed-modal')">
+                                        Join Event
+                                    </x-button>
+                                </div>
                             @else
-                                <x-button class="w-full" size="lg" type="button"
-                                    onclick="alert('The organizer did not put a participation link')">
-                                    Join Event
-                                </x-button>
+                                <div x-data>
+                                    <x-button class="w-full" size="lg" type="button"
+                                        x-on:click="$dispatch('open-modal', 'no-link-modal')">
+                                        Join Event
+                                    </x-button>
+                                </div>
                             @endif
                         @endif
 
@@ -307,16 +315,28 @@
                         </div>
                     </div>
                 </x-card>
+
+                <!-- Report Button -->
+                <div class="mt-8">
+                    <button x-data x-on:click="$dispatch('open-modal', 'report-event-modal')"
+                        class="text-xs text-red-500 hover:text-red-700 hover:underline flex items-center gap-1 transition-colors">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Report this event
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <x-modal name="share-modal" focusable>
         <div class="text-center">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <h2 class="text-lg font-medium text-gray-900">
                 Function In Development
             </h2>
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-1 text-sm text-gray-600">
                 This function is currently in development.
             </p>
             <div class="mt-6 flex justify-center">
@@ -325,5 +345,32 @@
                 </x-secondary-button>
             </div>
         </div>
+    </x-modal>
+
+    <x-modal name="report-event-modal" focusable>
+        <form method="POST" action="{{ route('events.report', $event) }}" class="p-6">
+            @csrf
+
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+                Report Event
+            </h2>
+
+            <div class="mb-6">
+                <x-input-label for="reason" value="Reason for reporting" class="mb-2" />
+                <textarea name="reason" id="reason" rows="4"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                    placeholder="Refers to false/dangerous link, inappropriate content, etc." required></textarea>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'report-event-modal')">
+                    Cancel
+                </x-secondary-button>
+
+                <x-button class="bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-800">
+                    Submit Report
+                </x-button>
+            </div>
+        </form>
     </x-modal>
 </x-app-layout>

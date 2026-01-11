@@ -37,6 +37,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('events', \App\Http\Controllers\EventController::class);
+
+    // Reporting
+    Route::post('/events/{event}/report', [App\Http\Controllers\ReportController::class, 'store'])->name('events.report');
+
+    // Admin Routes
+    Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+        Route::delete('/reports/{report}', [App\Http\Controllers\ReportController::class, 'destroy'])->name('reports.destroy');
+    });
 });
 
 require __DIR__ . '/auth.php';

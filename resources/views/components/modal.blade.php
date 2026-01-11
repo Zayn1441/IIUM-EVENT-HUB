@@ -16,12 +16,12 @@
         x-transition:leave-start="opacity-100 scale-100 zoom-in-100"
         x-transition:leave-end="opacity-0 scale-95 zoom-out-95"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" style="display: none;">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl sm:max-w-lg w-full p-6 border border-gray-200 dark:border-gray-700"
+        <div class="bg-white rounded-lg shadow-xl sm:max-w-lg w-full p-6 border border-gray-200"
             @click.away="open = false">
             @if($title)
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $title }}</h3>
+                <h3 class="text-lg font-semibold text-gray-900">{{ $title }}</h3>
                 @if($description)
-                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">{{ $description }}</p>
+                    <p class="text-gray-500 mt-2 text-sm">{{ $description }}</p>
                 @endif
 
                 <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">

@@ -140,22 +140,25 @@
                 </x-button>
                 @if($event->participation_link)
                     @if($isPast)
-                        <x-button size="sm" class="flex-1 w-full" type="button" onclick="alert('The event has passed')">
+                        <x-button size="sm" class="flex-1 w-full opacity-75" type="button"
+                            x-on:click.stop="$dispatch('open-modal', 'event-passed-modal')">
                             Join Event
                         </x-button>
                     @else
-                        <x-button size="sm" class="flex-1 w-full" as="a" href="{{ $event->participation_link }}" target="_blank">
+                        <x-button size="sm" class="flex-1 w-full" as="a" href="{{ $event->participation_link }}" target="_blank"
+                            x-on:click.stop="void(0)">
                             Join Event
                         </x-button>
                     @endif
                 @else
                     @if($isPast)
-                        <x-button size="sm" class="flex-1 w-full" type="button" onclick="alert('The event has passed')">
+                        <x-button size="sm" class="flex-1 w-full opacity-75" type="button"
+                            x-on:click.stop="$dispatch('open-modal', 'event-passed-modal')">
                             Join Event
                         </x-button>
                     @else
                         <x-button size="sm" class="flex-1 w-full" type="button"
-                            onclick="alert('The organizer did not put a participation link')">
+                            x-on:click.stop="$dispatch('open-modal', 'no-link-modal')">
                             Join Event
                         </x-button>
                     @endif
