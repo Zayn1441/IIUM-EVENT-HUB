@@ -164,9 +164,6 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    /**
-     * Display the specified resource.
-     */
     public function show(Event $event)
     {
         $event->load('tags');
@@ -249,7 +246,7 @@ class EventController extends Controller
         $klTomorrow = now('Asia/Kuala_Lumpur')->addDay()->format('Y-m-d');
         $klYesterday = now('Asia/Kuala_Lumpur')->subDay()->format('Y-m-d');
         $klToday = now('Asia/Kuala_Lumpur')->format('Y-m-d');
-        $eventDate = $event->date->format('Y-m-d'); // Date part only
+        $eventDate = \Carbon\Carbon::parse($event->date)->format('Y-m-d'); // Date part only
 
         if ($eventDate === $klTomorrow) {
             $contextMessage = "\n\nIt is now scheduled for tomorrow at " . \Carbon\Carbon::parse($event->time)->format('g:i A') . ".";
@@ -262,7 +259,6 @@ class EventController extends Controller
 
         foreach ($registrations as $registration) {
             // Updated: Creator/User should ALSO get the notice if they have saved/registered
-            // if ($registration->user_id == auth()->id()) { continue; }
 
             \App\Models\Notice::create([
                 'user_id' => $registration->user_id,

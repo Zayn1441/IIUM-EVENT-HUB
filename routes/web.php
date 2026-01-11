@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\Event;
-use App\Http\Controllers\EventController; // Added this use statement for EventController
+use App\Http\Controllers\EventController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -86,7 +86,6 @@ Route::middleware('auth')->group(function () {
         $stats = [
             'total_events' => \App\Models\Event::count(),
             'upcoming_events' => \App\Models\Event::where('date', '>=', now())->count(),
-            // Add logic for 'my_events' count if needed
         ];
         $upcomingEvents = \App\Models\Event::where('date', '>=', now())
             ->withCount('registrations')
