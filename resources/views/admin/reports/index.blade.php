@@ -54,6 +54,43 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                         <!-- Actions -->
                                         @if($report->event)
+                                            <button x-data=""
+                                                x-on:click="$dispatch('open-modal', 'contact-modal-{{ $report->id }}')"
+                                                class="text-green-600 hover:text-green-900 font-medium">
+                                                Contact
+                                            </button>
+
+                                            <!-- Contact Modal -->
+                                            <x-modal name="contact-modal-{{ $report->id }}" focusable>
+                                                <form method="POST" action="{{ route('admin.reports.message', $report->event) }}"
+                                                    class="p-6 text-left">
+                                                    @csrf
+                                                    <h2 class="text-lg font-medium text-gray-900 mb-4">
+                                                        Message Organizer: {{ $report->event->user->name }}
+                                                    </h2>
+                                                    <p class="text-sm text-gray-500 mb-4">
+                                                        Ref: {{ $report->event->title }}
+                                                    </p>
+                                                    <div class="mb-6">
+                                                        <x-input-label for="message" value="Message" class="mb-2" />
+                                                        <textarea name="message" rows="4"
+                                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                                                            placeholder="Enter your message here..." required></textarea>
+                                                    </div>
+                                                    <div class="flex justify-end gap-3">
+                                                        <x-secondary-button
+                                                            x-on:click="$dispatch('close-modal', 'contact-modal-{{ $report->id }}')">
+                                                            Cancel
+                                                        </x-secondary-button>
+                                                        <x-button>
+                                                            Send Message
+                                                        </x-button>
+                                                    </div>
+                                                </form>
+                                            </x-modal>
+
+                                            <span class="text-gray-300">|</span>
+
                                             <a href="{{ route('events.edit', $report->event) }}"
                                                 class="text-indigo-600 hover:text-indigo-900">Edit Event</a>
 

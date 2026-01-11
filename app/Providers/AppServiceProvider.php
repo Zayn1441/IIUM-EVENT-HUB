@@ -26,6 +26,12 @@ class AppServiceProvider extends ServiceProvider
                 $reportsCount = \App\Models\Report::count();
             }
             $view->with('reportsCount', $reportsCount);
+
+            $noticesCount = 0;
+            if (auth()->check()) {
+                $noticesCount = auth()->user()->notices()->where('is_read', false)->count();
+            }
+            $view->with('noticesCount', $noticesCount);
         });
     }
 }

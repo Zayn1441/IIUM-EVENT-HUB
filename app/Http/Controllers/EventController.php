@@ -225,6 +225,17 @@ class EventController extends Controller
             'is_starpoints' => $validated['is_starpoints'],
         ]);
 
+        // Notify user if updated by Admin
+        if (auth()->user()->is_admin && $event->user_id !== auth()->id()) {
+            \App\Models\Notice::create([
+                'user_id' => $event->user_id,
+                'type' => 'event_update',
+                'title' => 'Event Edited by Admin',
+                'message' => "Your event '{$event->title}' has been edited by an administrator.",
+                'action_url' => route('events.show', $event),
+            ]);
+        }
+
         // Handle Tags
         if ($request->filled('tags')) {
             $tagNames = array_map('trim', explode(',', $request->tags));
@@ -265,6 +276,17 @@ class EventController extends Controller
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($relativePath)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($relativePath);
             }
+        }
+
+        // Notify user if deleted by Admin
+        if (auth()->user()->is_admin && $event->user_id !== auth()->id()) {
+            \App\Models\Notice::create([
+                'user_id' => $event->user_id,
+                'type' => 'event_update',
+                'title' => 'Event Deleted by Admin',
+                'message' => "Your event '{$event->title}' has been deleted by an administrator.",
+                'action_url' => null, // Event is gone
+            ]);
         }
 
         $event->delete();

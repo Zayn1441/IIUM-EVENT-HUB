@@ -54,4 +54,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Registration::class);
     }
+
+    public function notices(): HasMany
+    {
+        return $this->hasMany(Notice::class);
+    }
+
+    public function savedEvents()
+    {
+        return $this->hasManyThrough(Event::class, Registration::class, 'user_id', 'id', 'id', 'event_id')
+            ->where('registrations.type', 'saved');
+    }
 }

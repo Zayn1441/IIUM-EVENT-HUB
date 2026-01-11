@@ -124,6 +124,26 @@
                         </x-sidebar.menu-item>
                     </div>
 
+                    <div class="px-2 py-2 mt-4">
+                        <x-sidebar.menu-item>
+                            <x-sidebar.menu-button :active="request()->routeIs('notices.index')" as="a"
+                                href="{{ route('notices.index') }}">
+                                <svg class="size-4 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                                </svg>
+                                <span>Notices</span>
+                                @if(isset($noticesCount) && $noticesCount > 0)
+                                    <span class="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-600 text-[10px] font-medium text-white">
+                                        {{ $noticesCount }}
+                                    </span>
+                                @endif
+                            </x-sidebar.menu-button>
+                        </x-sidebar.menu-item>
+                    </div>
+
                     @if(auth()->user()->is_admin)
                         <div class="px-2 py-2 mt-4">
                             <h4 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">Admin</h4>

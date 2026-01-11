@@ -43,4 +43,25 @@ class ReportController extends Controller
         $report->delete(); // This acts as "Ignore"
         return back()->with('success', 'Report ignored/deleted.');
     }
+
+    public function sendMessage(Request $request, Event $event)
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $request->validate([
+            'message' => 'required|string|max:1000',
+        ]);
+
+        \App\Models\Notice::create([
+            'user_id' => $event->user_id,
+            'type' => 'admin_message',
+            'title' => 'Message from Admin',
+            'message' => $request->message . "\n\nRegarding your event: " . $event->title,
+            'action_url' => route('events.show', $event),
+        ]);
+
+        return back()->with('success', 'Message sent to event organizer.');
+    }
 }
