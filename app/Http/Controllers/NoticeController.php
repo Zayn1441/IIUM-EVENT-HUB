@@ -9,7 +9,7 @@ class NoticeController extends Controller
 {
     public function index()
     {
-        $notices = auth()->user()->notices()->latest()->paginate(10);
+        $notices = auth()->user()->notices()->latest()->paginate(50);
 
         // Mark as read when viewing (optional, or by click)
         // For now, we'll mark them as read when the user visits the index page

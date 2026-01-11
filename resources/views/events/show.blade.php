@@ -138,8 +138,8 @@
                 <!-- About This Event -->
                 <x-card class="p-6">
                     <h3 class="font-bold text-foreground mb-4">About This Event</h3>
-                    <p class="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
-                        {!! preg_replace('~(https?://[^\s<]+)~', '<a href="$1" class="text-blue-600 hover:underline" target="_blank">$1</a>', e(trim($event->description))) !!}
+                    <p class="text-muted-foreground text-sm leading-relaxed whitespace-pre-line break-words">
+                        {!! preg_replace('~(https?://[^\s<]+)~', '<a href="$1" class="text-blue-600 hover:underline break-all" target="_blank">$1</a>', e(trim($event->description))) !!}
                     </p>
                 </x-card>
 
@@ -152,7 +152,7 @@
 
 
                 <!-- Event Details Summary & Action -->
-                <x-card class="p-6 sticky top-6">
+                <x-card class="p-6">
                     <x-card.title class="text-sm font-bold mb-6">Event Details</x-card.title>
 
                     <div class="space-y-5 mb-8">

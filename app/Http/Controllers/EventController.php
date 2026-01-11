@@ -237,25 +237,75 @@ class EventController extends Controller
         if ($event->wasChanged(['date', 'time'])) {
             \App\Models\Notice::where('action_url', route('events.show', $event))
                 ->where('type', 'system')
-                ->whereIn('title', ['Event Starting Tomorrow', 'Event Passed'])
+                ->whereIn('title', ['Event Starting Tomorrow', 'Event Starting Today', 'Event Passed'])
                 ->delete();
         }
 
         // Notify all registered/saved users about the update
         $registrations = $event->registrations()->select('user_id')->distinct()->get();
+
+        $contextMessage = "";
+        // Use KL Timezone for accurate "Tomorrow" check
+        $klTomorrow = now('Asia/Kuala_Lumpur')->addDay()->format('Y-m-d');
+        $klYesterday = now('Asia/Kuala_Lumpur')->subDay()->format('Y-m-d');
+        $klToday = now('Asia/Kuala_Lumpur')->format('Y-m-d');
+        $eventDate = $event->date->format('Y-m-d'); // Date part only
+
+        if ($eventDate === $klTomorrow) {
+            $contextMessage = "\n\nIt is now scheduled for tomorrow at " . \Carbon\Carbon::parse($event->time)->format('g:i A') . ".";
+        } elseif ($eventDate === $klToday) {
+            $contextMessage = "\n\nIt is now scheduled for TODAY at " . \Carbon\Carbon::parse($event->time)->format('g:i A') . ".";
+        } elseif ($eventDate < $klToday) {
+            // Strictly past dates (before today)
+            $contextMessage = "\n\nThe event has now passed.";
+        }
+
         foreach ($registrations as $registration) {
-            // Skip the user who made the update (usually the creator/admin)
-            if ($registration->user_id == auth()->id()) {
-                continue;
-            }
+            // Updated: Creator/User should ALSO get the notice if they have saved/registered
+            // if ($registration->user_id == auth()->id()) { continue; }
 
             \App\Models\Notice::create([
                 'user_id' => $registration->user_id,
                 'type' => 'event_update',
                 'title' => 'Event Updated',
-                'message' => "The event '{$event->title}' has been updated. Check the new details.",
+                'message' => "The event '{$event->title}' has been updated. Check the new details." . $contextMessage,
                 'action_url' => route('events.show', $event),
             ]);
+
+            // GENERATE IMMEDIATE SYSTEM NOTICE Logic
+            // If the event is NOW tomorrow (KL Time), generate that notice immediately
+            if ($eventDate === $klTomorrow) {
+                \App\Models\Notice::create([
+                    'user_id' => $registration->user_id,
+                    'type' => 'system',
+                    'title' => 'Event Starting Tomorrow',
+                    'message' => "The event '{$event->title}' is scheduled for tomorrow at {$event->time}.",
+                    'action_url' => route('events.show', $event),
+                    'created_at' => now(), // Explicitly set to now
+                ]);
+            }
+            // If the event is NOW TODAY (KL Time), generate that notice immediately
+            elseif ($eventDate === $klToday) {
+                \App\Models\Notice::create([
+                    'user_id' => $registration->user_id,
+                    'type' => 'system',
+                    'title' => 'Event Starting Today',
+                    'message' => "The event '{$event->title}' is happening TODAY at {$event->time}.",
+                    'action_url' => route('events.show', $event),
+                    'created_at' => now(),
+                ]);
+            }
+            // If the event is NOW past (KL Time), generate that notice immediately
+            elseif ($eventDate < $klToday) {
+                \App\Models\Notice::create([
+                    'user_id' => $registration->user_id,
+                    'type' => 'system',
+                    'title' => 'Event Passed',
+                    'message' => "The event '{$event->title}' has passed.",
+                    'action_url' => route('events.show', $event),
+                    'created_at' => now(),
+                ]);
+            }
         }
 
         // Notify user if updated by Admin
@@ -309,6 +359,18 @@ class EventController extends Controller
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($relativePath)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($relativePath);
             }
+        }
+
+        // Notify all registered/saved users about the deletion
+        $registrations = $event->registrations()->select('user_id')->distinct()->get();
+        foreach ($registrations as $registration) {
+            \App\Models\Notice::create([
+                'user_id' => $registration->user_id,
+                'type' => 'event_update',
+                'title' => 'Event Cancelled',
+                'message' => "The event '{$event->title}' has been removed by the organizer.",
+                'action_url' => null,
+            ]);
         }
 
         // Notify user if deleted by Admin

@@ -17,8 +17,33 @@ Route::middleware('auth')->group(function () {
         if ($user) {
             $savedEvents = $user->savedEvents;
             foreach ($savedEvents as $event) {
+                $klTomorrow = now('Asia/Kuala_Lumpur')->addDay()->format('Y-m-d');
+                $klYesterday = now('Asia/Kuala_Lumpur')->subDay()->format('Y-m-d');
+                $klToday = now('Asia/Kuala_Lumpur')->format('Y-m-d');
+                $eventDate = $event->date->format('Y-m-d');
+
+                // Event Starting Today
+                if ($eventDate === $klToday) {
+                    $existingNotice = $user->notices()
+                        ->where('type', 'system')
+                        ->where('action_url', route('events.show', $event))
+                        ->where('title', 'Event Starting Today')
+                        ->whereDate('created_at', now()->today())
+                        ->exists();
+
+                    if (!$existingNotice) {
+                        \App\Models\Notice::create([
+                            'user_id' => $user->id,
+                            'type' => 'system',
+                            'title' => 'Event Starting Today',
+                            'message' => "The event '{$event->title}' is happening TODAY at {$event->time}.",
+                            'action_url' => route('events.show', $event),
+                        ]);
+                    }
+                }
+
                 // Event Starting Tomorrow
-                if ($event->date->isTomorrow()) {
+                if ($eventDate === $klTomorrow) {
                     $existingNotice = $user->notices()
                         ->where('type', 'system')
                         ->where('action_url', route('events.show', $event))
@@ -38,7 +63,7 @@ Route::middleware('auth')->group(function () {
                 }
 
                 // Event Passed (e.g., yesterday)
-                if ($event->date->isYesterday()) {
+                if ($eventDate < $klToday) {
                     $existingNotice = $user->notices()
                         ->where('type', 'system')
                         ->where('action_url', route('events.show', $event))
